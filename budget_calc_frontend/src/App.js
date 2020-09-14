@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import ExpenseList from './components/ExpenseList'
 import ExpenseForm from './components/ExpenseForm'
@@ -6,19 +6,26 @@ import Alert from './components/Alert'
 import {v4 as uuid} from 'uuid'
 
 
-const initialExpenses = [
-  {id:uuid(), charge:`rent`, amount:1000},
-  {id:uuid(), charge:`car payment`, amount:2000},
-  {id:uuid(), charge:`credit card bill`, amount:3000}
-];
+
+
 
 
 
 function App() {
+  
+  useEffect(() => {
+    function fetchExpenses() {
+      fetch('http://localhost:3000/expenses')
+      .then(r => r.json())
+      .then(data => setExpenses(data))
+    };
+
+    fetchExpenses();
+  }, [])
 
   //************** state values  **************/
   // all expenses, add expense
-  const [expenses, setExpenses] = useState(initialExpenses)
+  const [expenses, setExpenses] = useState([])
   // single expense
   const [charge, setCharge] = useState('')
   // single amount
@@ -48,7 +55,10 @@ function App() {
     }
   }
 
+  
+
   return (
+    
     <>
       {/* {alert.show && <Alert type={alert.type} text={alert.text}/>} */}
       <h1>Budget Calculator</h1>
