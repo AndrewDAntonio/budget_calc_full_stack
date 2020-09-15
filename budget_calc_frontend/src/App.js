@@ -3,7 +3,7 @@ import './App.css';
 import ExpenseList from './components/ExpenseList'
 import ExpenseForm from './components/ExpenseForm'
 import Alert from './components/Alert'
-import {v4 as uuid} from 'uuid'
+
 
 
 
@@ -13,15 +13,7 @@ import {v4 as uuid} from 'uuid'
 
 function App() {
   
-  useEffect(() => {
-    function fetchExpenses() {
-      fetch('http://localhost:3000/expenses')
-      .then(r => r.json())
-      .then(data => setExpenses(data))
-    };
 
-    fetchExpenses();
-  }, [])
 
   //************** state values  **************/
   // all expenses, add expense
@@ -33,29 +25,93 @@ function App() {
   // alert
   // const[alert, showAlert] = useState({show: false})
 
+  // ********* fetch functions ********** //
+  function fetchExpenses() {
+    fetch('http://localhost:3000/expenses')
+    .then(r => r.json())
+    .then(data => setExpenses(data))
+  };
+
+  function postExpense(expense) {
+    fetch('http://localhost:3000/expenses', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json" 
+      },
+      body: JSON.stringify(expense)
+    })
+    .then(r => r.json())
+    .then(newExpense => {
+      setExpenses([...expenses, newExpense])
+      setAmount('')
+      setCharge('')
+    })
+
+
+  }
+
+  function deleteExpense(id) {
+    // fetch(`http://localhost:3000/expenses/${id}`, {
+    //   method: 'DELETE'
+    // })
+    // .then(r => r.json())
+    // .then(deletedExpense => {
+    //   const spliceIndex = expenses.findIndex(ele => ele.id === deletedExpense.id)
+    //   if (spliceIndex > -1) {
+        
+    //     setExpenses(expenses.splice(spliceIndex))
+    //     console.log(expenses.splice(spliceIndex))
+    //   }
+      
+    // })
+      fetch(`http://localhost:3000/expenses/${id}`)
+      .then(r => r.json())
+      .then(expense => {
+        const spliceIndex = expenses.findIndex(ele => 
+          ele.id === expense.id)
+        console.log(`spliceIndex:`,spliceIndex)
+        console.log(expenses.splice(2))
+        console.log('Expenses:',expenses)
+        // console.log(`Expenses"`,expenses)
+        
+      })
+  }
+  console.log(expenses)
+  // ************* initial fetch **************/
+  useEffect(() => {
+    
+    fetchExpenses();
+  }, [])
   //************** functionality  **************/
   const handleCharge = e => {
     setCharge(e.target.value)
   }
 
   const handleAmount = e => {
-    setAmount(e.target.value)
+    setAmount(e.target.key)
   }
 
   const handleSubmit = e => {
     e.preventDefault();
     if (charge !== '' && amount > 0) {
-      const singleExpense = {id: uuid(), charge, amount}
-      setExpenses([...expenses,singleExpense])
-      setCharge('')
-      setAmount("")
+      const singleExpense = {charge, amount}
+      postExpense(singleExpense)
+      console.log(singleExpense)
     }
     else {
       //handle calling an Alert
     }
   }
 
-  
+  const handleDelete = e => {
+    e.preventDefault();
+    const id = e.target.closest('.clear-btn').value
+    deleteExpense(id)
+    
+
+    
+  }
+
 
   return (
     
@@ -63,8 +119,8 @@ function App() {
       {/* {alert.show && <Alert type={alert.type} text={alert.text}/>} */}
       <h1>Budget Calculator</h1>
       <main className='App'>
-        <ExpenseForm charge={charge} amount={amount} handleCharge={handleCharge} handleAmount={handleAmount} handleSubmit={handleSubmit}/>
-        <ExpenseList expenses={expenses}/>
+        <ExpenseForm charge={charge} amount={amount} handleCharge={handleCharge} handleAmount={handleAmount} handleSubmit={handleSubmit} />
+        <ExpenseList expenses={expenses} handleDelete={handleDelete}/>
       </main>
       <h1>
         Total Spending: <span className="total">

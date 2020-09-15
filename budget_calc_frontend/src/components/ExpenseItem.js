@@ -2,7 +2,7 @@ import React from 'react';
 import {MdEdit, MdDelete} from "react-icons/md"
 
 
-export const ExpenseItem= ({expense}) => {
+export const ExpenseItem= ({expense, handleDelete}) => {
 
 const {id, charge, amount} = expense
     return (
@@ -15,8 +15,8 @@ const {id, charge, amount} = expense
                 <button className='edit-btn' aria-label="edit button">
                     <MdEdit/>
                 </button>
-                <button className='clear-btn' aria-label="delete button">
-                    <MdDelete/>
+                <button  onClick={handleDelete} value={id} className='clear-btn' >
+                    <MdDelete  />
                 </button>
             </div>
         </li>
