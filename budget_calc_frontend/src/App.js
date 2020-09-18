@@ -24,7 +24,11 @@ function App() {
   const [amount, setAmount] = useState('')
   // alert
   // const[alert, showAlert] = useState({show: false})
-
+// ************* initial fetch **************/
+  useEffect(() => {
+    
+    fetchExpenses();
+    }, [])
   // ********* fetch functions ********** //
   function fetchExpenses() {
     fetch('http://localhost:3000/expenses')
@@ -33,6 +37,7 @@ function App() {
   };
 
   function postExpense(expense) {
+    
     fetch('http://localhost:3000/expenses', {
       method: 'POST',
       headers: {
@@ -51,44 +56,27 @@ function App() {
   }
 
   function deleteExpense(id) {
-    // fetch(`http://localhost:3000/expenses/${id}`, {
-    //   method: 'DELETE'
-    // })
-    // .then(r => r.json())
-    // .then(deletedExpense => {
-    //   const spliceIndex = expenses.findIndex(ele => ele.id === deletedExpense.id)
-    //   if (spliceIndex > -1) {
+    fetch(`http://localhost:3000/expenses/${id}`, {
+      method: 'DELETE'
+    })
+    .then(r => r.json())
+    .then(deletedExpense => {
+      const spliceIndex = expenses.findIndex(ele => ele.id === deletedExpense.id)
+        expenses.splice(spliceIndex,1)
+        setExpenses([...expenses])
         
-    //     setExpenses(expenses.splice(spliceIndex))
-    //     console.log(expenses.splice(spliceIndex))
-    //   }
-      
-    // })
-      fetch(`http://localhost:3000/expenses/${id}`)
-      .then(r => r.json())
-      .then(expense => {
-        const spliceIndex = expenses.findIndex(ele => 
-          ele.id === expense.id)
-        console.log(`spliceIndex:`,spliceIndex)
-        console.log(expenses.splice(2))
-        console.log('Expenses:',expenses)
-        // console.log(`Expenses"`,expenses)
         
-      })
+    })
   }
-  console.log(expenses)
-  // ************* initial fetch **************/
-  useEffect(() => {
-    
-    fetchExpenses();
-  }, [])
+  
+  
   //************** functionality  **************/
   const handleCharge = e => {
     setCharge(e.target.value)
   }
 
   const handleAmount = e => {
-    setAmount(e.target.key)
+    setAmount(e.target.value)
   }
 
   const handleSubmit = e => {
@@ -96,7 +84,6 @@ function App() {
     if (charge !== '' && amount > 0) {
       const singleExpense = {charge, amount}
       postExpense(singleExpense)
-      console.log(singleExpense)
     }
     else {
       //handle calling an Alert
